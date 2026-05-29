@@ -869,6 +869,132 @@
   </section>
 
   <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 14 — 권한 관리: 어디서 해야 하는가 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-teal"></div>
+    <div class="body">
+      <span class="badge badge-teal">부록 ① 권한 관리</span>
+      <div class="slide-title">권한 관리는<br>어디서 해야 하는가?</div>
+
+      <div class="slide-sub">
+        인증(Authentication)과 권한(Authorization)은 분리되어 다뤄야 합니다.
+        한 곳에서 다 하려고 하면 <strong style="color:var(--white)">둘 다 망가집니다.</strong>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--white);margin-top:4px">권한은 두 층으로 나뉩니다</div>
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+        <table class="tbl">
+          <thead>
+            <tr><th>구분</th><th>예시</th><th>관리 위치</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="teal">거친 권한</strong><br><span class="mono muted" style="font-size:10px">Coarse-grained</span></td>
+              <td>역할(관리자/일반/외부)<br>포털 접근 가능 여부</td>
+              <td class="teal bold">IDS<br>중앙 집중</td>
+            </tr>
+            <tr>
+              <td><strong class="amber">세부 권한</strong><br><span class="mono muted" style="font-size:10px">Fine-grained</span></td>
+              <td>"이 데이터셋만 조회"<br>"이 부서 자료만 편집"</td>
+              <td class="amber bold">각 포털<br>자체 관리</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card card-teal">
+        <div class="card-title teal">IDS가 책임지는 것</div>
+        <div class="card-body" style="color:var(--white);font-size:11.5px;line-height:1.8">
+          • 사용자–역할 매핑 (RBAC)<br>
+          • 부서·그룹 정보 (오아시스에서 동기화)<br>
+          • 역할 변경 시 모든 포털 토큰 무효화<br>
+          • 권한 변경 이력 감사 로그
+        </div>
+      </div>
+
+      <div class="card card-amber">
+        <div class="card-title amber">각 포털이 책임지는 것</div>
+        <div class="card-body" style="color:var(--white);font-size:11.5px;line-height:1.8">
+          • 리소스 단위 ACL<br>
+          &nbsp;&nbsp;(CMP 워크로드, 데이터허브 데이터셋)<br>
+          • 비즈니스 규칙 (결재선, 승인 권한)<br>
+          • 도메인 특화 ABAC
+        </div>
+      </div>
+
+      <div class="quote-box teal">
+        <strong class="teal">원칙:</strong> 거친 권한은 중앙화돼야 정합성이 유지되고,
+        세부 권한은 포털 도메인에 묶여 있어 중앙에서 알 수 없습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 15 — A안 권한 관리 실무 패턴 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-teal"></div>
+    <div class="body">
+      <span class="badge badge-teal">부록 ② 실무 패턴</span>
+      <div class="slide-title">A안에서의<br>권한 관리 흐름</div>
+
+      <!-- Flow diagram -->
+      <div class="card">
+        <div class="card-title teal">권한 정보 흐름</div>
+        <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--white);line-height:1.9;padding:8px 4px">
+          <div style="color:var(--muted)">오아시스 <span class="teal">(인증만)</span></div>
+          <div style="color:var(--teal);padding-left:8px">↓ 사용자 ID</div>
+          <div><strong style="color:var(--teal)">IDS</strong> <span style="color:var(--muted)">← 역할·소속·기본 권한 관리</span></div>
+          <div style="color:var(--teal);padding-left:8px">↓ JWT { roles, groups, ... }</div>
+          <div><strong style="color:var(--white)">각 포털</strong> <span style="color:var(--muted)">← 클레임으로 1차 판정</span></div>
+          <div style="padding-left:48px;color:var(--muted)">← 자체 DB로 세부 권한 판정</div>
+        </div>
+      </div>
+
+      <!-- IDS data model -->
+      <div style="font-size:12px;font-weight:700;color:var(--white);margin-top:4px">IDS 권한 모델 (예시)</div>
+      <div class="code-block"><span class="cc">[ User ]</span>          <span class="cc">[ Role ]</span>            <span class="cc">[ Permission ]</span>
+<span class="ck">user_id</span>            <span class="ck">role_id</span>             <span class="ck">perm_id</span>
+<span class="ck">oasis_sub</span>          <span class="ck">role_name</span>           <span class="ck">perm_code</span> <span class="cc">(cmp.read)</span>
+<span class="ck">dept_code</span>          <span class="ck">description</span>         <span class="cc">...</span>
+
+       <span class="cc">[ User_Role ]</span>     <span class="cc">[ Role_Permission ]</span>
+         <span class="ck">user_id</span>           <span class="ck">role_id</span>
+         <span class="ck">role_id</span>           <span class="ck">perm_id</span>
+         <span class="ck">scope</span>             <span class="cc">...</span></div>
+
+      <!-- Token claim example -->
+      <div style="font-size:12px;font-weight:700;color:var(--white);margin-top:4px">토큰 발급 시 클레임 (예시)</div>
+      <div class="code-block">{
+  <span class="ck">"sub"</span>: <span class="cs">"user123"</span>,
+  <span class="ck">"aud"</span>: <span class="cs">"cmp-portal"</span>,
+  <span class="cd">"roles"</span>: [<span class="cs">"cmp.user"</span>, <span class="cs">"datahub.viewer"</span>],
+  <span class="cd">"groups"</span>: [<span class="cs">"dx-team"</span>],
+  <span class="ck">"dept"</span>: <span class="cs">"디지털혁신실"</span>,
+  <span class="ck">"exp"</span>: <span class="cs">1734567890</span>
+}</div>
+
+      <!-- Policy decisions -->
+      <div class="card card-amber">
+        <div class="card-title amber">⚠ 사업 단계에서 결정해야 할 운영 정책</div>
+        <div class="card-body" style="color:var(--white);font-size:11.5px;line-height:1.8">
+          • <strong>역할 정의 주체</strong> — 정보보호팀? 포털 담당자?<br>
+          • <strong>권한 부여 워크플로우</strong> — 신청·결재 시스템 별도? IDS 어드민?<br>
+          • <strong>오아시스–IDS 동기화</strong> — 실시간 vs 배치?<br>
+          • <strong>응급 권한 회수 경로</strong> — 사고 시 누가 즉시 차단?
+        </div>
+      </div>
+
+      <div class="quote-box teal">
+        <strong class="teal">핵심:</strong> A안에서 <strong>IDS에 권한 관리 모듈이 빠지면</strong>
+        "통합 인증은 되는데 권한은 따로 관리"되는 어색한 구조가 됩니다.
+        통합포털 가치는 권한 통합까지 갈 때 비로소 완성됩니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
   <!-- SLIDE 13 — QR 코드 (단독) -->
   <!-- ══════════════════════════════════ -->
   <section class="slide" id="slide-qr">
@@ -898,7 +1024,7 @@
 <div id="nav">
   <div class="nav-btn" id="btn-prev" onclick="go(-1)">‹</div>
   <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
-  <div id="slide-counter">1 / 14</div>
+  <div id="slide-counter">1 / 16</div>
   <div class="nav-btn" id="btn-next" onclick="go(1)">›</div>
 </div>
 
