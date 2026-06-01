@@ -640,7 +640,135 @@
   </section>
 
   <!-- ══════════════════════════════════ -->
-  <!-- SLIDE 7 — 운영 시나리오 ①: 퇴직자 -->
+  <!-- SLIDE 7 — 토큰 만료·갱신 흐름 부재 (C안 구조적 결과 ③) -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-red"></div>
+    <div class="body">
+      <span class="badge badge-red">C안의 기술적 결과 ③</span>
+      <div class="slide-title">토큰 만료·갱신<br>흐름이 그림에 없다</div>
+
+      <div class="slide-sub">
+        C안 도식에는 토큰 발급·전달은 그려져 있지만,
+        <strong style="color:var(--white)">"만료되면 누가 어떻게 갱신하는가"</strong>가 정의돼 있지 않습니다.
+        가능한 시나리오는 모두 문제가 있습니다.
+      </div>
+
+      <div class="method-card red">
+        <div class="method-head">
+          <span class="method-name red">시나리오 ① 하위 시스템이 직접 OASIS에 refresh</span>
+          <span class="badge badge-red">최악</span>
+        </div>
+        <div class="method-desc">
+          <strong class="red">Refresh Token이 모든 시스템(외부 회사 포함)에 퍼짐.</strong>
+          Refresh Token은 Access Token보다 훨씬 강력 — 새 토큰 무한 발급 가능.
+          한 외부 회사에서 유출되면 그 사용자 계정을 영구적으로 장악할 수 있음.
+        </div>
+      </div>
+
+      <div class="method-card amber">
+        <div class="method-head">
+          <span class="method-name amber">시나리오 ② 만료 시 재로그인 강요</span>
+          <span class="badge badge-amber">UX 파괴</span>
+        </div>
+        <div class="method-desc">
+          하위 시스템이 401 받으면 사용자에게 OASIS 재로그인 요구.
+          <strong class="amber">5~15분마다 로그인 팝업</strong> → SSO 도입 의미 상실.
+        </div>
+      </div>
+
+      <div class="method-card amber">
+        <div class="method-head">
+          <span class="method-name amber">시나리오 ③ 메인 포털이 토큰 공유</span>
+          <span class="badge badge-amber">파급 ↑</span>
+        </div>
+        <div class="method-desc">
+          메인 포털이 refresh해서 새 토큰을 하위에 또 뿌림 → 슬라이드 5의
+          <strong class="amber">토큰 전달 방식 문제가 매번 반복</strong>. 갱신 주기마다 노출 표면 증가.
+        </div>
+      </div>
+
+      <div class="method-card teal">
+        <div class="method-head">
+          <span class="method-name teal">✅ 정상 설계 — 메인 포털 단독 보유</span>
+          <span class="badge badge-teal">권장</span>
+        </div>
+        <div class="method-desc">
+          <strong class="teal">Refresh Token은 메인 포털(또는 IDS)만 보유.</strong>
+          하위 시스템은 401 받으면 브로커에 재요청 → 브로커가 새 short-lived 토큰을
+          발급해 전달. Refresh Token은 절대 외부 경계를 넘지 않음.
+        </div>
+      </div>
+
+      <div class="quote-box">
+        <strong>핵심:</strong> 토큰 수명 관리는 SSO 설계의 절반입니다.
+        <strong class="red">그림에 갱신 흐름이 없다는 건 운영 단계에 폭탄을 남기는 것</strong>과 같습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 8 — 외부 회사 경계 & JWT 폐기 불가 (C안 구조적 결과 ④) -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-red"></div>
+    <div class="body">
+      <span class="badge badge-red">C안의 기술적 결과 ④</span>
+      <div class="slide-title">외부 회사 경계 +<br>JWT 폐기 불가</div>
+
+      <div class="slide-sub">
+        C안에서는 OASIS 원본 토큰이 외부 3개사 시스템에 그대로 상주합니다.
+        <strong style="color:var(--white)">신뢰 도메인 경계 자체가 흐려집니다.</strong>
+      </div>
+
+      <!-- 외부 경계 위험 -->
+      <div class="card card-red">
+        <div class="card-title red">① 한 회사 유출 = OASIS 전체 노출</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          하위 시스템·솔루션 UI가 외부 회사 것이라면,
+          <strong>그 회사 인프라에 OASIS 원본 토큰이 상주</strong>.<br>
+          한 회사에서 유출되면 OASIS 신뢰 도메인 <strong class="red">전체가 동시에 노출</strong>.
+          토큰 폐기·감사 통제권을 K-water가 잃습니다.<br><br>
+          <span class="muted">※ 같은 회사인 CMP는 절충 가능. 외부 회사엔 적용 불가.</span>
+        </div>
+      </div>
+
+      <!-- JWT 폐기 불가 -->
+      <div class="card card-red">
+        <div class="card-title red">② JWT라 만료 전 강제 폐기 불가</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          OASIS 토큰은 <strong>JWT (자체 검증 구조)</strong>.
+          서버 조회 없이 서명만으로 유효성 판정 → 발급 후
+          <strong class="red">서버가 "이 토큰 폐기"를 강제할 방법이 없음.</strong><br><br>
+          <strong>결과:</strong>
+          • 사용자가 메인에서 로그아웃해도 → 하위 시스템엔 <strong class="red">exp까지 그대로 유효</strong><br>
+          • 토큰 탈취 발견해도 → 만료 시점까지 차단 불가<br>
+          • 공용 PC·실수 노출 시 대응 수단 부재
+        </div>
+      </div>
+
+      <!-- SLO 부재 명시 -->
+      <div class="card card-amber">
+        <div class="card-title amber">③ Single Logout (SLO) 작동 불가</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          C안 슬라이드 하단에 <strong class="amber">"하위 시스템에서 로그아웃 동기화 불가"</strong>가
+          직접 명시되어 있음.<br><br>
+          SSO를 도입하면서 SLO를 포기하는 것 — <strong>로그아웃의 책임을 사용자에게 떠넘기는 설계</strong>.
+          ISMS-P 2.10.4 (세션 관리) 위반.
+        </div>
+      </div>
+
+      <div class="quote-box teal">
+        <strong class="teal">정상 설계:</strong>
+        외부 시스템엔 메인 포털(브로커)이 재발급한
+        <strong>회사별 audience·최소 scope·short-lived 토큰</strong>만 전달.
+        OASIS 원본은 경계를 넘지 않음. 폐기는 short-lived(5~15분) + jti blocklist로 상쇄.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 9 — 운영 시나리오 ①: 퇴직자 -->
   <!-- ══════════════════════════════════ -->
   <section class="slide">
     <div class="stripe stripe-red"></div>
@@ -875,6 +1003,85 @@
       <div class="quote-box teal">
         <strong class="teal">결론:</strong> C안의 위험은 펜테스트에서 명백히 드러나며,
         <strong>구조 자체의 모순에서 비롯되므로 부분 수정으로는 해결되지 않습니다.</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SLIDE — 보완 방향: 시스템 성격별 분리 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-amber"></div>
+    <div class="body">
+      <span class="badge badge-amber">보완 방향</span>
+      <div class="slide-title">시스템 성격별로<br>설계를 쪼개면 풀린다</div>
+
+      <div class="slide-sub">
+        C안을 통째로 적용하지 않고 <strong style="color:var(--white)">내부와 외부를 분리</strong>하면
+        치명적 문제 대부분이 해소됩니다.
+      </div>
+
+      <!-- 내부 시스템 -->
+      <div class="card card-teal">
+        <div class="card-title teal">① 내부 시스템 (CMP, 같은 회사)</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          <strong>OASIS JWT 패스스루 유지 + JWKS 자체 검증.</strong><br>
+          같은 신뢰 도메인 안이라 토큰이 경계를 넘지 않음.<br>
+          <strong class="teal">→ 저공수로 운영 가능.</strong>
+        </div>
+      </div>
+
+      <!-- 외부 시스템 -->
+      <div class="card card-amber">
+        <div class="card-title amber">② 외부 3개사 시스템</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          <strong>메인 포털이 내부 JWT 재발급 브로커 역할.</strong><br>
+          OASIS 원본 토큰은 외부 경계를 넘지 않음.<br>
+          회사별 <span class="mono teal">aud</span> + 최소 scope + short-lived 토큰만 발급.<br>
+          <strong class="amber">→ 문제 ① (외부 경계) · ③ (aud 약화) 해소.</strong>
+        </div>
+      </div>
+
+      <!-- 로그아웃·폐기 -->
+      <div class="card card-amber">
+        <div class="card-title amber">③ 로그아웃·폐기 (문제 ②)</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          • 토큰 수명을 <strong>5~15분 short-lived</strong>로 단축 → JWT 폐기 불가를 시간으로 상쇄<br>
+          • 메인 포털 세션 무효화로 갱신 차단 (브로커가 거부)<br>
+          • 완전한 SLO 필요 시 <strong>jti blocklist</strong> 도입<br>
+          <strong class="amber">→ 공용 PC·탈취 대응 수단 확보.</strong>
+        </div>
+      </div>
+
+      <!-- 만료·갱신 -->
+      <div class="card card-amber">
+        <div class="card-title amber">④ 만료·갱신 (문제 ④)</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          • <strong>Refresh Token은 메인 포털만 보유.</strong> 외부 회사에 절대 전달 안 함.<br>
+          • 하위 시스템은 401 받으면 메인 포털(브로커)에 새 토큰 재요청.<br>
+          <strong class="amber">→ Refresh Token 확산 위험 차단.</strong>
+        </div>
+      </div>
+
+      <!-- 한 줄 요약 표 -->
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+        <table class="tbl">
+          <thead>
+            <tr><th>구분</th><th>토큰 처리</th><th>관리 주체</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="bold teal">내부 (CMP)</td><td>OASIS JWT 직접 검증</td><td>각 시스템 (JWKS)</td></tr>
+            <tr><td class="bold amber">외부 3개사</td><td>재발급된 short-lived JWT</td><td>메인 포털 브로커</td></tr>
+            <tr><td class="bold teal">Refresh Token</td><td>외부로 전달 안 함</td><td>메인 포털 단독</td></tr>
+            <tr><td class="bold amber">로그아웃·폐기</td><td>short-lived + jti blocklist</td><td>메인 포털 세션</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="quote-box teal">
+        <strong class="teal">정리:</strong> 같은 "C안"이라도 내부엔 패스스루,
+        외부엔 브로커 재발급. <strong>시스템 신뢰 경계를 기준으로 설계가 갈려야</strong>
+        토큰 패스스루의 위험이 외부로 새지 않습니다.
       </div>
     </div>
   </section>
@@ -1243,7 +1450,7 @@
 <div id="nav">
   <div class="nav-btn" id="btn-prev" onclick="go(-1)">‹</div>
   <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
-  <div id="slide-counter">1 / 18</div>
+  <div id="slide-counter">1 / 21</div>
   <div class="nav-btn" id="btn-next" onclick="go(1)">›</div>
 </div>
 
