@@ -25,18 +25,22 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; background: var(--bg); font-family: var(--font-ko); color: var(--white); overflow: hidden; touch-action: none; }
-  #deck { width: 100%; height: 100%; position: relative; overflow: hidden; }
+  html, body { width: 100%; min-height: 100%; background: var(--bg); font-family: var(--font-ko); color: var(--white); }
+  #deck { width: 100%; position: relative; }
 
   .slide {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    display: flex; flex-direction: column; padding: 0;
-    opacity: 0; transform: translateX(100%);
-    transition: transform 0.42s cubic-bezier(0.4,0,0.2,1), opacity 0.42s cubic-bezier(0.4,0,0.2,1);
-    pointer-events: none; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 0;
   }
-  .slide.active { opacity: 1; transform: translateX(0); pointer-events: all; }
-  .slide.prev { opacity: 0; transform: translateX(-100%); }
+  .slide.active { display: flex; animation: slideFadeIn 0.35s ease both; }
+
+  @keyframes slideFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
   .stripe { width: 100%; height: 4px; flex-shrink: 0; }
   .stripe-red   { background: var(--red); }
@@ -222,16 +226,13 @@
   /* DESKTOP / LARGE SCREEN — 화면 비례 유동 스케일  */
   /* ════════════════════════════════════════════ */
   @media (min-width: 900px) {
-    html, body { touch-action: auto; }
-
-    /* 슬라이드를 화면 가득 채우고 본문은 화면 폭에 비례한 넓은 컬럼으로 */
+    /* 슬라이드는 최소 화면 높이, 콘텐츠가 더 길면 페이지가 자연 스크롤 */
     .slide { justify-content: center; }
     .body {
       align-self: center;
-      justify-content: center;       /* 짧은 슬라이드는 세로 중앙 정렬 */
+      justify-content: center;
       width: 100%;
       max-width: clamp(860px, 72vw, 1500px);
-      min-height: 100%;
       padding: clamp(40px, 4vh, 72px) clamp(48px, 4vw, 96px) clamp(96px, 12vh, 140px);
       gap: clamp(16px, 1.6vw, 30px);
     }
@@ -1102,25 +1103,9 @@
     const next = cur + dir;
     if (next < 0 || next >= total) return;
 
-    const current = slides[cur];
-    const target  = slides[next];
-
-    // Safety: clear .active from any non-target slide
-    slides.forEach((s, i) => {
-      if (i !== next) s.classList.remove('active');
-    });
-
-    if (dir > 0) {
-      // Forward: current slides off to the left
-      current.classList.add('prev');
-    } else {
-      // Backward: target was at .prev (left) — remove it so it slides in
-      target.classList.remove('prev');
-    }
-
-    target.classList.add('active');
+    slides.forEach((s, i) => s.classList.toggle('active', i === next));
     cur = next;
-    target.scrollTop = 0;
+    window.scrollTo({ top: 0, behavior: 'auto' });
     updateNav();
   }
 
