@@ -219,79 +219,68 @@
   .isms-body p { font-size: 11.5px; color: var(--muted); line-height: 1.6; }
 
   /* ════════════════════════════════════════════ */
-  /* DESKTOP / LARGE SCREEN OVERRIDES             */
+  /* DESKTOP / LARGE SCREEN — 화면 비례 유동 스케일  */
   /* ════════════════════════════════════════════ */
   @media (min-width: 900px) {
     html, body { touch-action: auto; }
+
+    /* 슬라이드를 화면 가득 채우고 본문은 화면 폭에 비례한 넓은 컬럼으로 */
+    .slide { justify-content: center; }
     .body {
       align-self: center;
+      justify-content: center;       /* 짧은 슬라이드는 세로 중앙 정렬 */
       width: 100%;
-      max-width: 820px;
-      padding: 48px 56px 120px;
-      gap: 20px;
+      max-width: clamp(860px, 72vw, 1500px);
+      min-height: 100%;
+      padding: clamp(40px, 4vh, 72px) clamp(48px, 4vw, 96px) clamp(96px, 12vh, 140px);
+      gap: clamp(16px, 1.6vw, 30px);
     }
-    .slide-title { font-size: 38px; line-height: 1.2; }
-    .slide-sub   { font-size: 16px; line-height: 1.75; }
-    .badge       { font-size: 12px; padding: 4px 12px; }
 
-    .card        { padding: 18px 22px; border-radius: 12px; }
-    .card-title  { font-size: 16px; margin-bottom: 8px; }
-    .card-body   { font-size: 14px; line-height: 1.7; }
+    .slide-title { font-size: clamp(38px, 3.4vw, 60px); line-height: 1.18; }
+    .slide-sub   { font-size: clamp(16px, 1.25vw, 23px); line-height: 1.75; }
+    .badge       { font-size: clamp(12px, 0.85vw, 15px); padding: 5px 14px; }
 
-    .quote-box   { font-size: 15.5px; padding: 16px 20px; line-height: 1.75; }
-    .code-block  { font-size: 13px; padding: 14px 18px; line-height: 1.7; }
+    .card        { padding: clamp(18px, 1.4vw, 28px) clamp(20px, 1.6vw, 32px); border-radius: 14px; }
+    .card-title  { font-size: clamp(16px, 1.25vw, 22px); margin-bottom: 10px; }
+    .card-body   { font-size: clamp(14px, 1.05vw, 19px); line-height: 1.7; }
 
-    .tbl         { font-size: 14px; }
-    .tbl th, .tbl td { padding: 12px 14px; }
+    .quote-box   { font-size: clamp(15.5px, 1.2vw, 21px); padding: clamp(16px, 1.3vw, 26px) clamp(18px, 1.4vw, 28px); line-height: 1.78; }
+    .code-block  { font-size: clamp(12.5px, 0.95vw, 17px); padding: clamp(14px, 1.1vw, 22px) clamp(16px, 1.3vw, 26px); line-height: 1.7; }
 
-    .method-card  { padding: 14px 18px; }
-    .method-name  { font-size: 15px; }
-    .method-desc  { font-size: 13px; line-height: 1.65; }
+    .tbl         { font-size: clamp(14px, 1.1vw, 19px); }
+    .tbl th, .tbl td { padding: clamp(12px, 1vw, 18px) clamp(12px, 1vw, 18px); }
 
-    .opt-card    { padding: 20px; border-radius: 14px; }
-    .opt-title   { font-size: 16px; }
-    .opt-grid    { font-size: 14px; gap: 7px 14px; }
+    .method-card  { padding: clamp(14px, 1.1vw, 22px) clamp(16px, 1.3vw, 26px); border-radius: 10px; }
+    .method-name  { font-size: clamp(15px, 1.15vw, 20px); }
+    .method-desc  { font-size: clamp(13px, 1vw, 18px); line-height: 1.65; }
 
-    .q-card      { padding: 22px; }
-    .q-icon      { font-size: 38px; }
-    .q-title     { font-size: 16px; margin-bottom: 6px; }
-    .q-desc      { font-size: 14px; line-height: 1.7; }
+    .opt-card    { padding: clamp(20px, 1.6vw, 32px); border-radius: 16px; }
+    .opt-title   { font-size: clamp(16px, 1.25vw, 22px); }
+    .opt-grid    { font-size: clamp(14px, 1.1vw, 19px); gap: 8px 16px; }
 
-    .cover-icon  { font-size: 80px; margin: 36px 0 14px; }
-    .cover-title { font-size: 64px; }
-    .cover-desc  { font-size: 17px; line-height: 1.8; }
+    .q-card      { padding: clamp(22px, 1.8vw, 36px); }
+    .q-icon      { font-size: clamp(38px, 3vw, 56px); }
+    .q-title     { font-size: clamp(16px, 1.25vw, 22px); margin-bottom: 8px; }
+    .q-desc      { font-size: clamp(14px, 1.1vw, 19px); line-height: 1.7; }
 
-    .step-row    { padding: 14px 18px; gap: 16px; }
-    .step-dot    { width: 38px; height: 38px; font-size: 16px; }
-    .step-content strong { font-size: 14.5px; }
-    .step-content span   { font-size: 13px; }
+    .cover-icon  { font-size: clamp(80px, 6vw, 120px); margin: clamp(24px,3vh,48px) 0 16px; }
+    .cover-title { font-size: clamp(60px, 5.5vw, 110px); }
+    .cover-desc  { font-size: clamp(17px, 1.4vw, 26px); line-height: 1.8; }
 
-    .isms-item   { padding: 16px 18px; gap: 16px; }
-    .isms-no     { font-size: 13px; min-width: 48px; }
-    .isms-body strong { font-size: 15px; }
-    .isms-body p      { font-size: 13.5px; line-height: 1.7; }
+    .step-row    { padding: clamp(14px, 1.2vw, 22px) clamp(16px, 1.4vw, 26px); gap: 18px; }
+    .step-dot    { width: clamp(38px, 3vw, 48px); height: clamp(38px, 3vw, 48px); font-size: clamp(16px, 1.3vw, 22px); }
+    .step-content strong { font-size: clamp(14.5px, 1.15vw, 20px); }
+    .step-content span   { font-size: clamp(13px, 1vw, 18px); }
 
-    #nav         { height: 72px; padding: 0 32px; }
-    .nav-btn     { width: 52px; height: 52px; font-size: 22px; }
-    #progress-bar-wrap { margin: 0 22px; height: 4px; }
-    #slide-counter { font-size: 13px; min-width: 50px; }
-  }
+    .isms-item   { padding: clamp(16px, 1.3vw, 26px); gap: 18px; }
+    .isms-no     { font-size: clamp(13px, 1vw, 18px); min-width: 56px; }
+    .isms-body strong { font-size: clamp(15px, 1.2vw, 21px); }
+    .isms-body p      { font-size: clamp(13.5px, 1.05vw, 19px); line-height: 1.72; }
 
-  @media (min-width: 1400px) {
-    .body {
-      max-width: 940px;
-      padding: 60px 64px 140px;
-      gap: 24px;
-    }
-    .slide-title { font-size: 46px; }
-    .slide-sub   { font-size: 17px; }
-    .cover-title { font-size: 78px; }
-    .cover-desc  { font-size: 19px; }
-    .card-title  { font-size: 17px; }
-    .card-body   { font-size: 15px; }
-    .quote-box   { font-size: 16.5px; }
-    .tbl         { font-size: 15px; }
-    .code-block  { font-size: 14px; }
+    #nav         { height: clamp(72px, 6vh, 88px); padding: 0 clamp(32px, 3vw, 56px); }
+    .nav-btn     { width: clamp(52px, 4vw, 64px); height: clamp(52px, 4vw, 64px); font-size: clamp(22px, 1.8vw, 30px); }
+    #progress-bar-wrap { margin: 0 clamp(22px, 2vw, 36px); height: 4px; }
+    #slide-counter { font-size: clamp(13px, 1vw, 17px); min-width: 56px; }
   }
 </style>
 </head>
