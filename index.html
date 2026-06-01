@@ -646,11 +646,11 @@
     <div class="stripe stripe-red"></div>
     <div class="body">
       <span class="badge badge-red">C안의 기술적 결과 ③</span>
-      <div class="slide-title">토큰 만료·갱신<br>흐름이 그림에 없다</div>
+      <div class="slide-title">토큰 만료·갱신<br>흐름이 C안에 없다</div>
 
       <div class="slide-sub">
-        C안 도식에는 토큰 발급·전달은 그려져 있지만,
-        <strong style="color:var(--white)">"만료되면 누가 어떻게 갱신하는가"</strong>가 정의돼 있지 않습니다.
+        C안은 토큰 발급·전달만 다룰 뿐,
+        <strong style="color:var(--white)">"만료되면 누가 어떻게 갱신하는가"</strong>가 설계에서 빠져 있습니다.
         가능한 시나리오는 모두 문제가 있습니다.
       </div>
 
@@ -702,7 +702,7 @@
 
       <div class="quote-box">
         <strong>핵심:</strong> 토큰 수명 관리는 SSO 설계의 절반입니다.
-        <strong class="red">그림에 갱신 흐름이 없다는 건 운영 단계에 폭탄을 남기는 것</strong>과 같습니다.
+        <strong class="red">C안에 갱신 흐름이 빠져 있다는 건 운영 단계에 폭탄을 남기는 것</strong>과 같습니다.
       </div>
     </div>
   </section>
@@ -751,8 +751,8 @@
       <div class="card card-amber">
         <div class="card-title amber">③ Single Logout (SLO) 작동 불가</div>
         <div class="card-body" style="color:var(--white);line-height:1.8">
-          C안 슬라이드 하단에 <strong class="amber">"하위 시스템에서 로그아웃 동기화 불가"</strong>가
-          직접 명시되어 있음.<br><br>
+          C안 자체가 <strong class="amber">"하위 시스템에서 로그아웃 동기화 불가"</strong>를
+          한계로 인정하고 있음.<br><br>
           SSO를 도입하면서 SLO를 포기하는 것 — <strong>로그아웃의 책임을 사용자에게 떠넘기는 설계</strong>.
           ISMS-P 2.10.4 (세션 관리) 위반.
         </div>
