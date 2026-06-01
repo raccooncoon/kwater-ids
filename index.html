@@ -1061,6 +1061,159 @@
   </section>
 
   <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 16 — IDS 권한 모델 쉽게 설명 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-teal"></div>
+    <div class="body">
+      <span class="badge badge-teal">부록 ③ 쉬운 설명</span>
+      <div class="slide-title">IDS 권한 모델<br>회사 출입증과 같습니다</div>
+
+      <div class="slide-sub">
+        앞 슬라이드의 5개 테이블은 매일 쓰는 <strong style="color:var(--white)">회사 출입증 시스템</strong>과 같은 구조입니다.
+      </div>
+
+      <!-- 비유 매핑 표 -->
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+        <table class="tbl">
+          <thead>
+            <tr><th>테이블</th><th>저장 내용</th><th>회사 비유</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="teal bold">User</td><td>시스템 사용자 명단</td><td>직원 명부 (이름·사번)</td></tr>
+            <tr><td class="teal bold">Role</td><td>정의된 직책·역할</td><td>"팀장", "일반사원" 목록</td></tr>
+            <tr><td class="teal bold">Permission</td><td>제공 가능한 권한 항목</td><td>"회의실", "서버실" 출입</td></tr>
+            <tr><td class="amber bold">User_Role</td><td>누가 어떤 직책인가</td><td>"홍길동 = 팀장" 출입증</td></tr>
+            <tr><td class="amber bold">Role_Permission</td><td>직책별 가능 권한</td><td>"팀장 → 회의실+서버실" 규정</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 왜 5개로 나누나? -->
+      <div style="font-size:clamp(13px,1.05vw,20px);font-weight:700;color:var(--white);margin-top:4px">왜 사람-역할-권한 3단계로 나누나?</div>
+
+      <div class="card card-red">
+        <div class="card-title red">❌ 사람한테 권한을 직접 부여하면</div>
+        <div class="card-body" style="color:var(--white);font-family:var(--font-mono);font-size:clamp(11.5px,0.9vw,17px);line-height:1.85">
+          홍길동 → [CMP읽기, CMP쓰기, DataHub, AI, ...]<br>
+          김철수 → [CMP읽기, CMP쓰기, DataHub, AI, ...]<br>
+          이영희 → [CMP읽기, CMP쓰기, DataHub, AI, ...]<br>
+          <span class="red">→ 권한 1개 바뀌면 1,000명 다 수정</span>
+        </div>
+      </div>
+
+      <div class="card card-teal">
+        <div class="card-title teal">✅ 역할을 거치면</div>
+        <div class="card-body" style="color:var(--white);font-family:var(--font-mono);font-size:clamp(11.5px,0.9vw,17px);line-height:1.85">
+          홍길동 ─┐<br>
+          김철수 ─┼─→ [팀장] ─→ [CMP, DataHub, AI ...]<br>
+          이영희 ─┘<br>
+          <span class="teal">→ "팀장" 권한만 한 번 바꾸면 모두 적용</span>
+        </div>
+      </div>
+
+      <!-- 권한 확인 흐름 -->
+      <div class="card">
+        <div class="card-title teal">실제 권한 확인 흐름 (예시)</div>
+        <div class="card-body" style="color:var(--white);font-size:clamp(13px,1.05vw,20px);line-height:1.9">
+          <strong>Q.</strong> "홍길동이 CMP 데이터를 읽을 수 있나?"<br><br>
+          ① <span class="muted">User</span>에서 홍길동 찾기 → <span class="mono teal">user_id = 42</span><br>
+          ② <span class="muted">User_Role</span>에서 42의 역할 → <span class="mono teal">[팀장, 데이터분석가]</span><br>
+          ③ <span class="muted">Role_Permission</span>에서 권한 합치기 → <span class="mono teal">[cmp.read, cmp.write, ...]</span><br>
+          ④ <span class="mono teal">cmp.read</span> 있음 → <strong class="green">✅ 허용</strong>
+        </div>
+      </div>
+
+      <div class="quote-box teal">
+        <strong class="teal">핵심:</strong> 사람과 권한 사이에 <strong>"역할"을 끼워 넣어</strong> 관리 부담을 1/N로 줄이는 구조입니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- SLIDE 17 — 각 포털 책임 영역 쉽게 설명 -->
+  <!-- ══════════════════════════════════ -->
+  <section class="slide">
+    <div class="stripe stripe-amber"></div>
+    <div class="body">
+      <span class="badge badge-amber">부록 ④ 쉬운 설명</span>
+      <div class="slide-title">각 포털이<br>책임지는 영역</div>
+
+      <div class="slide-sub">
+        IDS가 모를 수밖에 없는 <strong style="color:var(--white)">"안쪽 세계"</strong> —
+        데이터·업무규칙·도메인 지식이 필요한 권한들.
+      </div>
+
+      <!-- ① 리소스 ACL -->
+      <div class="card card-teal">
+        <div class="card-title teal">① 리소스 단위 ACL — "이 자료, 누가 볼 수 있어?"</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          자료마다 직접 붙은 <strong>"출입 가능 명단"</strong>.<br><br>
+          <strong class="teal">예시</strong><br>
+          • "2024 수질 데이터셋" → 디지털혁신실 전원 읽기 / 박OO만 수정<br>
+          • "AI개발용 GPU 워크로드" → AI팀 사용 / 인프라팀 관리<br><br>
+          <strong class="teal">왜 포털이?</strong> 데이터셋·워크로드 ID는 매일 생기고 사라짐.
+          그 자료를 가진 포털만 알 수 있음.
+        </div>
+      </div>
+
+      <!-- ② 비즈니스 규칙 -->
+      <div class="card card-amber">
+        <div class="card-title amber">② 비즈니스 규칙 — "결재선·승인 조건"</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          조직의 업무 흐름에 따른 규칙.<br><br>
+          <strong class="amber">예시</strong><br>
+          • GPU 4장 이하 → 팀장 결재 / 16장 초과 → 본부장 결재<br>
+          • 데이터 외부 공개 → 정보공개위원회 결재 필요<br><br>
+          <strong class="amber">왜 포털이?</strong> 결재선 바뀔 때마다 IDS 코드 수정하면
+          모든 포털이 영향받음. 도메인 규칙은 도메인 안에서.
+        </div>
+      </div>
+
+      <!-- ③ 도메인 ABAC -->
+      <div class="card card-red">
+        <div class="card-title red">③ 도메인 특화 ABAC — "상황·속성 조합"</div>
+        <div class="card-body" style="color:var(--white);line-height:1.8">
+          사용자·자료·상황 속성을 조합한 <strong>동적 판단</strong>.<br><br>
+          <strong class="red">예시</strong><br>
+          • 본인이 만든 데이터셋만 수정 가능<br>
+          • 같은 부서 자료만 조회 가능<br>
+          • 근무시간(09–18) 외엔 운영 변경 불가<br><br>
+          <strong class="red">왜 포털이?</strong> 판단에 필요한 데이터(소유자·부서·프로젝트)가
+          포털 DB 안에 있음.
+        </div>
+      </div>
+
+      <!-- RBAC vs ABAC -->
+      <div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border)">
+        <table class="tbl">
+          <thead>
+            <tr><th>방식</th><th>판단 로직</th><th>관리 위치</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="teal bold">RBAC</td>
+              <td>"팀장이면 → 허용"<br><span class="muted" style="font-size:0.85em">역할 한 줄로 결정</span></td>
+              <td class="teal bold">IDS</td>
+            </tr>
+            <tr>
+              <td class="amber bold">ABAC</td>
+              <td>"팀장 + 본인 프로젝트 + 근무시간 → 허용"<br><span class="muted" style="font-size:0.85em">여러 조건 조합</span></td>
+              <td class="amber bold">각 포털</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="quote-box teal" style="text-align:center;line-height:1.9">
+        <strong>🎯 한 줄 정리</strong><br>
+        <strong style="color:var(--white)">IDS</strong>는 "이 사람이 어느 <strong class="teal">무대까지</strong> 들어올 수 있나"를 결정하고,<br>
+        <strong style="color:var(--white)">각 포털</strong>은 무대 안에서 "이 <strong class="amber">자료를 만질 수 있나</strong>"를 결정합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════ -->
   <!-- SLIDE 13 — QR 코드 (단독) -->
   <!-- ══════════════════════════════════ -->
   <section class="slide" id="slide-qr">
@@ -1090,7 +1243,7 @@
 <div id="nav">
   <div class="nav-btn" id="btn-prev" onclick="go(-1)">‹</div>
   <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
-  <div id="slide-counter">1 / 16</div>
+  <div id="slide-counter">1 / 18</div>
   <div class="nav-btn" id="btn-next" onclick="go(1)">›</div>
 </div>
 
